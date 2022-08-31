@@ -1,4 +1,5 @@
-import './App.css';
+import { useEffect, useState } from "react";
+import "./App.css";
 
 // Questions:
 // 1. Load data from local file (path: “https://ac.aws.citizennet.com/assets/qspreviews/qs_interview_data.json”)
@@ -6,14 +7,31 @@ import './App.css';
 // 3. Add a hover state with a dark, semi-transparent overlay and display the ID of the hovered brand.
 
 function App() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch("https://ac.aws.citizennet.com/assets/qspreviews/qs_interview_data.json")
+      .then((res) => res.json())
+      .then(({ data }) => {
+        // Sort by audience_size, in descending order
+        setData(data.sort((a, b) => b.source_items.audience_size - a.source_items.audience_size))
+      });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <div>
-          Let's start here
-        </div>
-        
-      </header>
+      <div className="audiences">
+        {data.map(item => (
+          <div key={item.name} className="audience-logo">
+            {/* Logo image */}
+            <img src={item.social_media_pages?.picture} alt={item.social_media_pages?.name} />
+            {/* dark, semi-transparent overlay */}
+            <div className="audience-overlay">
+              {item.source_items.id}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
